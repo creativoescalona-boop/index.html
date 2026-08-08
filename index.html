@@ -281,7 +281,6 @@
             }
         }
 
-        // CARGAR API KEY GUARDADA
         window.onload = function() {
             const savedKey = localStorage.getItem('NEXUS_GEMINI_KEY');
             if (savedKey) {
@@ -299,7 +298,6 @@
             }
         }
 
-        // MOTOR DE RECONOCIMIENTO Y VOZ
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         let isListening = false;
@@ -357,9 +355,10 @@
             document.getElementById('voiceStatus').innerText = "PRESIONA EL MICRÓFONO PARA HABLAR CON JARVIS";
         }
 
-        // CONEXIÓN CON v1beta Y GEMINI 1.5 FLASH
+        // CONEXIÓN CON MODELO ESTÁNDAR COMPATIBLE
         async function processWithGemini(userQuery) {
-            const apiKey = localStorage.getItem('NEXUS_GEMINI_KEY') || document.getElementById('apiKey').value.trim();
+            let apiKey = localStorage.getItem('NEXUS_GEMINI_KEY') || document.getElementById('apiKey').value;
+            apiKey = apiKey ? apiKey.trim() : '';
             
             if (!apiKey) {
                 const errorMsg = "Atención Leo: Debes ingresar y guardar tu API Key arriba para conectar mi cerebro.";
@@ -369,8 +368,8 @@
                 return;
             }
 
-            // Endpoint exacto para v1beta
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+            // Uso de gemini-1.5-flash-latest en v1beta
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
             const systemPrompt = "Eres Jarvis, el asistente ejecutivo de inteligencia, estrategia, mixología y finanzas de Leo. Responde en español de forma directa, profesional, breve (máximo 2 a 3 oraciones para ser habladas fluidamente) y con un tono estratégico y resolutivo.";
 
