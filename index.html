@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS - Centro de Mando</title>
+    <style>
+        :root {
+            --bg-color: #050b14;
+            --panel-bg: rgba(10, 25, 47, 0.7);
+            --border-color: #00f0ff;
+            --text-color: #e6f1ff;
+            --accent-color: #00f0ff;
+            --glow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        [data-theme="cyberpunk"] {
+            --bg-color: #0d0221;
+            --panel-bg: rgba(26, 11, 46, 0.8);
+            --border-color: #ff0055;
+            --text-color: #ffe6f0;
+            --accent-color: #ff0055;
+            --glow: 0 0 15px rgba(255, 0, 85, 0.5);
+        }
+
+        [data-theme="minimal"] {
+            --bg-color: #f4f6f9;
+            --panel-bg: #ffffff;
+            --border-color: #cbd5e1;
+            --text-color: #0f172a;
+            --accent-color: #2563eb;
+            --glow: none;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: var(--glow);
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        button:hover {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--glow);
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: var(--accent-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #00ff66;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 8px #00ff66;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1><span class="status-dot"></span>MATRIZ NEXUS</h1>
+        <div class="controls">
+            <button onclick="setTheme('default')">Neón</button>
+            <button onclick="setTheme('cyberpunk')">Cyber</button>
+            <button onclick="setTheme('minimal')">Ejecutivo</button>
+        </div>
+    </header>
+
+    <div class="grid">
+        <div class="card">
+            <h2>01. ESTRATEGIA Y NEUROMARKETING</h2>
+            <p>Estado del sistema: Listo para procesar campañas, arquitectura de marca y embudos de alta conversión.</p>
+        </div>
+
+        <div class="card">
+            <h2>02. FINANZAS Y RENTABILIDAD</h2>
+            <p>Mapeo de costos, márgenes netos e ingeniería de precios activados.</p>
+        </div>
+
+        <div class="card">
+            <h2>03. NÚCLEO DE PRODUCTIVIDAD</h2>
+            <p>Línea directa con el asistente. Enfoque prioritario: Escalamiento comercial.</p>
+        </div>
+    </div>
+
+    <script>
+        function setTheme(themeName) {
+            if (themeName === 'default') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', themeName);
+            }
+        }
+    </script>
+</body>
+</html>
