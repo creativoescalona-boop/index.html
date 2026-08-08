@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS - Centro de Mando</title>
+    <title>NEXUS - Centro de Mando Jarvis</title>
     <style>
         :root {
             --bg-color: #050b14;
-            --panel-bg: rgba(10, 25, 47, 0.7);
+            --panel-bg: rgba(10, 25, 47, 0.75);
             --border-color: #00f0ff;
             --text-color: #e6f1ff;
             --accent-color: #00f0ff;
@@ -16,7 +16,7 @@
 
         [data-theme="cyberpunk"] {
             --bg-color: #0d0221;
-            --panel-bg: rgba(26, 11, 46, 0.8);
+            --panel-bg: rgba(26, 11, 46, 0.85);
             --border-color: #ff0055;
             --text-color: #ffe6f0;
             --accent-color: #ff0055;
@@ -88,6 +88,40 @@
             color: #000;
         }
 
+        .api-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 15px 20px;
+            box-shadow: var(--glow);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .api-panel label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: var(--accent-color);
+        }
+
+        .api-input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .api-input-group input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            color: var(--text-color);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
         .voice-panel {
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
@@ -102,13 +136,13 @@
         }
 
         .mic-btn {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: transparent;
             border: 2px solid var(--accent-color);
             color: var(--accent-color);
-            font-size: 1.8rem;
+            font-size: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -122,6 +156,12 @@
             animation: pulse 1.5s infinite;
         }
 
+        .mic-btn.thinking {
+            border-color: #ffaa00;
+            color: #ffaa00;
+            animation: spin 1s infinite linear;
+        }
+
         @keyframes pulse {
             0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
             70% { box-shadow: 0 0 0 20px rgba(0, 240, 255, 0); }
@@ -130,13 +170,28 @@
 
         .transcript-box {
             width: 100%;
-            min-height: 50px;
-            background: rgba(0,0,0,0.2);
+            min-height: 60px;
+            background: rgba(0,0,0,0.3);
             border: 1px dashed var(--border-color);
             border-radius: 8px;
-            padding: 10px;
-            font-size: 0.9rem;
+            padding: 12px;
+            font-size: 0.95rem;
             color: var(--text-color);
+            text-align: left;
+            line-height: 1.4;
+        }
+
+        .response-box {
+            width: 100%;
+            min-height: 80px;
+            background: rgba(0, 240, 255, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 0.95rem;
+            color: var(--accent-color);
+            text-align: left;
+            line-height: 1.4;
         }
 
         .grid {
@@ -175,7 +230,7 @@
 <body>
 
     <header>
-        <h1><span class="status-dot"></span>MATRIZ NEXUS</h1>
+        <h1><span class="status-dot"></span>MATRIZ NEXUS JARVIS</h1>
         <div class="controls">
             <button onclick="setTheme('default')">Neón</button>
             <button onclick="setTheme('cyberpunk')">Cyber</button>
@@ -183,27 +238,37 @@
         </div>
     </header>
 
+    <!-- CONFIGURACIÓN API KEY -->
+    <div class="api-panel">
+        <label for="apiKey">🔑 CONFIGURACIÓN DE CONEXIÓN GEMINI (API KEY):</label>
+        <div class="api-input-group">
+            <input type="password" id="apiKey" placeholder="Pega aquí tu API Key de Google AI Studio...">
+            <button onclick="saveApiKey()">Guardar Clave</button>
+        </div>
+    </div>
+
     <!-- MÓDULO DE VOZ JARVIS -->
     <div class="voice-panel">
         <button id="micBtn" class="mic-btn" onclick="toggleVoice()">🎙️</button>
-        <p id="voiceStatus" style="font-size: 0.85rem; letter-spacing: 1px;">PRESIONA PARA INICIAR COMANDO DE VOZ</p>
-        <div id="transcript" class="transcript-box">Esperando instrucción...</div>
+        <p id="voiceStatus" style="font-size: 0.85rem; letter-spacing: 1px;">PRESIONA EL MICRÓFONO PARA HABLAR CON JARVIS</p>
+        <div class="transcript-box" id="transcript"><b>Tú:</b> Esperando instrucción por voz...</div>
+        <div class="response-box" id="responseBox"><b>Jarvis:</b> Saludos, Leo. Asistente Nexus listo para recibir órdenes.</div>
     </div>
 
     <div class="grid">
         <div class="card">
             <h2>01. ESTRATEGIA Y NEUROMARKETING</h2>
-            <p>Estado del sistema: Listo para procesar campañas, arquitectura de marca y embudos de alta conversión.</p>
+            <p>Conexión directa activa para crear copys, diseñar campañas y optimizar embudos por voz.</p>
         </div>
 
         <div class="card">
             <h2>02. FINANZAS Y RENTABILIDAD</h2>
-            <p>Mapeo de costos, márgenes netos e ingeniería de precios activados.</p>
+            <p>Mapeo de costos, análisis de precios y rentabilidad alimentado por IA.</p>
         </div>
 
         <div class="card">
             <h2>03. NÚCLEO DE PRODUCTIVIDAD</h2>
-            <p>Línea directa con el asistente. Enfoque prioritario: Escalamiento comercial.</p>
+            <p>Comandos directos de voz para coordinar operaciones y tomar decisiones en tiempo real.</p>
         </div>
     </div>
 
@@ -216,7 +281,25 @@
             }
         }
 
-        // MOTOR DE VOZ Y RECONOCIMIENTO
+        // CARGAR API KEY GUARDADA
+        window.onload = function() {
+            const savedKey = localStorage.getItem('NEXUS_GEMINI_KEY');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+            }
+        };
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKey').value.trim();
+            if (key) {
+                localStorage.setItem('NEXUS_GEMINI_KEY', key);
+                alert('¡API Key guardada exitosamente en este dispositivo!');
+            } else {
+                alert('Por favor ingresa una API Key válida.');
+            }
+        }
+
+        // MOTOR DE RECONOCIMIENTO Y VOZ
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         let recognition;
         let isListening = false;
@@ -228,26 +311,33 @@
 
             recognition.onstart = function() {
                 isListening = true;
-                document.getElementById('micBtn').classList.add('recording');
-                document.getElementById('voiceStatus').innerText = "ESCUCHANDO...";
+                const micBtn = document.getElementById('micBtn');
+                micBtn.classList.remove('thinking');
+                micBtn.classList.add('recording');
+                document.getElementById('voiceStatus').innerText = "ESCUCHANDO TU COMANDO...";
             };
 
-            recognition.onresult = function(event) {
+            recognition.onresult = async function(event) {
                 const text = event.results[0][0].transcript;
-                document.getElementById('transcript').innerText = ' Leo: "' + text + '"';
-                speakResponse("Comando recibido, Leo. Procesando: " + text);
+                document.getElementById('transcript').innerHTML = '<b>Tú:</b> "' + text + '"';
+                
+                stopListening();
+                document.getElementById('voiceStatus').innerText = "PROCESANDO COMANDO EN EL CEREBRO NEXUS...";
+                document.getElementById('micBtn').classList.add('thinking');
+
+                await processWithGemini(text);
             };
 
             recognition.onerror = function(event) {
-                document.getElementById('voiceStatus').innerText = "ERROR DE RECONOCIMIENTO";
+                document.getElementById('voiceStatus').innerText = "ERROR AL ESCUCHAR. REINTENTA.";
                 stopListening();
             };
 
             recognition.onend = function() {
-                stopListening();
+                if(isListening) stopListening();
             };
         } else {
-            document.getElementById('transcript').innerText = "El reconocimiento de voz no está soportado en este navegador.";
+            document.getElementById('transcript').innerText = "Tu navegador no soporta reconocimiento de voz directo.";
         }
 
         function toggleVoice() {
@@ -261,12 +351,63 @@
 
         function stopListening() {
             isListening = false;
-            document.getElementById('micBtn').classList.remove('recording');
-            document.getElementById('voiceStatus').innerText = "PRESIONA PARA INICIAR COMANDO DE VOZ";
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.remove('recording');
+            micBtn.classList.remove('thinking');
+            document.getElementById('voiceStatus').innerText = "PRESIONA EL MICRÓFONO PARA HABLAR CON JARVIS";
+        }
+
+        // CONEXIÓN DIRECTA CON GEMINI
+        async function processWithGemini(userQuery) {
+            const apiKey = localStorage.getItem('NEXUS_GEMINI_KEY') || document.getElementById('apiKey').value.trim();
+            
+            if (!apiKey) {
+                const errorMsg = "Atención Leo: Debes ingresar y guardar tu API Key de Google AI Studio arriba para conectar mi cerebro.";
+                document.getElementById('responseBox').innerHTML = '<b>Jarvis:</b> ' + errorMsg;
+                speakResponse(errorMsg);
+                stopListening();
+                return;
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+            const systemPrompt = "Eres Jarvis, el asistente ejecutivo de inteligencia, estrategia, mixología y finanzas de Leo. Responde en español de forma directa, profesional, breve (máximo 2 a 3 oraciones para ser habladas fluidamente) y con un tono estratégico y resolutivo.";
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: systemPrompt + "\n\nConsulta del usuario: " + userQuery }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    const aiReply = data.candidates[0].content.parts[0].text;
+                    document.getElementById('responseBox').innerHTML = '<b>Jarvis:</b> ' + aiReply;
+                    speakResponse(aiReply);
+                } else {
+                    throw new Error("Respuesta inválida de la API");
+                }
+            } catch (err) {
+                console.error(err);
+                const errMsg = "Error al conectar con la red de Gemini. Verifica la API Key y la conexión.";
+                document.getElementById('responseBox').innerHTML = '<b>Jarvis:</b> ' + errMsg;
+                speakResponse(errMsg);
+            } finally {
+                stopListening();
+            }
         }
 
         function speakResponse(text) {
             if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = 'es-ES';
                 utterance.rate = 1.0;
