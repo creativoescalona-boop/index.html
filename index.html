@@ -76,16 +76,67 @@
             background: transparent;
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 6px 12px;
+            padding: 8px 14px;
             border-radius: 6px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
         button:hover {
             background: var(--accent-color);
             color: #000;
+        }
+
+        .voice-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: var(--glow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .mic-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--glow);
+            cursor: pointer;
+        }
+
+        .mic-btn.recording {
+            background: var(--accent-color);
+            color: #000;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+            70% { box-shadow: 0 0 0 20px rgba(0, 240, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+        }
+
+        .transcript-box {
+            width: 100%;
+            min-height: 50px;
+            background: rgba(0,0,0,0.2);
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.9rem;
+            color: var(--text-color);
         }
 
         .grid {
@@ -132,6 +183,13 @@
         </div>
     </header>
 
+    <!-- MÓDULO DE VOZ JARVIS -->
+    <div class="voice-panel">
+        <button id="micBtn" class="mic-btn" onclick="toggleVoice()">🎙️</button>
+        <p id="voiceStatus" style="font-size: 0.85rem; letter-spacing: 1px;">PRESIONA PARA INICIAR COMANDO DE VOZ</p>
+        <div id="transcript" class="transcript-box">Esperando instrucción...</div>
+    </div>
+
     <div class="grid">
         <div class="card">
             <h2>01. ESTRATEGIA Y NEUROMARKETING</h2>
@@ -155,6 +213,64 @@
                 document.documentElement.removeAttribute('data-theme');
             } else {
                 document.documentElement.setAttribute('data-theme', themeName);
+            }
+        }
+
+        // MOTOR DE VOZ Y RECONOCIMIENTO
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition;
+        let isListening = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = false;
+
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('micBtn').classList.add('recording');
+                document.getElementById('voiceStatus').innerText = "ESCUCHANDO...";
+            };
+
+            recognition.onresult = function(event) {
+                const text = event.results[0][0].transcript;
+                document.getElementById('transcript').innerText = ' Leo: "' + text + '"';
+                speakResponse("Comando recibido, Leo. Procesando: " + text);
+            };
+
+            recognition.onerror = function(event) {
+                document.getElementById('voiceStatus').innerText = "ERROR DE RECONOCIMIENTO";
+                stopListening();
+            };
+
+            recognition.onend = function() {
+                stopListening();
+            };
+        } else {
+            document.getElementById('transcript').innerText = "El reconocimiento de voz no está soportado en este navegador.";
+        }
+
+        function toggleVoice() {
+            if (!recognition) return;
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        }
+
+        function stopListening() {
+            isListening = false;
+            document.getElementById('micBtn').classList.remove('recording');
+            document.getElementById('voiceStatus').innerText = "PRESIONA PARA INICIAR COMANDO DE VOZ";
+        }
+
+        function speakResponse(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
             }
         }
     </script>
