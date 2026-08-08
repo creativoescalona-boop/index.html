@@ -357,12 +357,12 @@
             document.getElementById('voiceStatus').innerText = "PRESIONA EL MICRÓFONO PARA HABLAR CON JARVIS";
         }
 
-        // CONEXIÓN DIRECTA CON GEMINI 1.5 FLASH
+        // CONEXIÓN ROBUSTA CON GEMINI 1.5 FLASH
         async function processWithGemini(userQuery) {
             const apiKey = localStorage.getItem('NEXUS_GEMINI_KEY') || document.getElementById('apiKey').value.trim();
             
             if (!apiKey) {
-                const errorMsg = "Atención Leo: Debes ingresar y guardar tu API Key de Google AI Studio arriba para conectar mi cerebro.";
+                const errorMsg = "Atención Leo: Debes ingresar y guardar tu API Key arriba para conectar mi cerebro.";
                 document.getElementById('responseBox').innerHTML = '<b>Jarvis:</b> ' + errorMsg;
                 speakResponse(errorMsg);
                 stopListening();
@@ -376,30 +376,35 @@
             try {
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({
                         contents: [{
-                            parts: [
-                                { text: systemPrompt + "\n\nConsulta del usuario: " + userQuery }
-                            ]
+                            parts: [{ text: systemPrompt + "\n\nConsulta del usuario: " + userQuery }]
                         }]
                     })
                 });
 
                 const data = await response.json();
                 
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                if (data.error) {
+                    console.error("Error devuelto por Gemini:", data.error);
+                    throw new Error(data.error.message || "Error devuelto por la API de Google");
+                }
+
+                if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
                     const aiReply = data.candidates[0].content.parts[0].text;
                     document.getElementById('responseBox').innerHTML = '<b>Jarvis:</b> ' + aiReply;
                     speakResponse(aiReply);
                 } else {
-                    throw new Error("Respuesta inválida de la API");
+                    throw new Error("Estructura de respuesta no reconocida");
                 }
             } catch (err) {
-                console.error(err);
-                const errMsg = "Error al conectar con la red de Gemini. Verifica la API Key y la conexión.";
+                console.error("Detalle del error:", err);
+                const errMsg = "Error de conexión: " + (err.message || "Verifica tu conexión o clave de API.");
                 document.getElementById('responseBox').innerHTML = '<b>Jarvis:</b> ' + errMsg;
-                speakResponse(errMsg);
+                speakResponse("Error al conectar con la red de Gemini.");
             } finally {
                 stopListening();
             }
